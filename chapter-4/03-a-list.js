@@ -67,4 +67,4 @@ console.log(nthvalue);
   prepend() is fairly straight-forward so long as you can envision the function and its arguments as well as the result we're seekend.
 
   nth() first checks whether there's no list provided. Then it recursively calls itself for each step of the list, and reducing n until n is 0, at which point it returns list.value.
-*/
+/*
