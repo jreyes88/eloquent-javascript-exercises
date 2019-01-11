@@ -59,5 +59,5 @@ console.log(arrayValue);
 /*
   Admittedly I always need to check the solution before I try the second function out. Walking through it, the loop inside the function divides the array in half (ignoring the middle number if the array has an odd number of items in it), then replaces array[0] with array[array.length - 1 - 0], then array [1] with array[array.length - 1 - 1], and so on.
 
-  I hesitate to take a wild guess as to which is more useful or efficient, but I think in production I would always opt to go with the first function, reverseArray().
+  I hesitate to take a wild guess as to which is more useful or efficient, but I think in production I would always opt to go with the first function, reverseArray(). I don't think modifying the source data is ever a good idea.
 */
