@@ -17,7 +17,7 @@
   Output: 3
 */
 
-// My solution:
+// My Solution:
 let triangleLine = "";
 for (let i = 0; i < 7; i += 1) {
   triangleLine += "#";
