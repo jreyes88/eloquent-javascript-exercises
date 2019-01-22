@@ -1,6 +1,10 @@
 /*
-  Project: Electronic Life
-  Our project in this chapter is to build a virtual ecosystem, a little world populated with critters that move around and struggle for survival.
+  Artificial Stupidity
+  Having the inhavitants of our world go extinct after a few minutes is kind of depressing. To deal with this, we could try to create a smarter plant eater.
+
+  There are several obvious problems with our herbivores. First, they are terribly greedy, stuffing themselves with every plant they see until they have wipedo ut the local plant life. Second, their randomized movement (recall that the view.find method returns a random direction when multiple directions match) causes them to stumble around ineffectively and starve if there don't happen to be any plants nearby. And finally, they breed very fast, which makes the cycles between abundance and famine quite intense.
+
+  Write a new critter type tha tries to address one or more of these point and substitute it for the old PlantEater type in the valley world. See how it fares. Tweak it some more if necessary.
 */
 
 var plan = ["############################",
@@ -335,15 +339,33 @@ PlantEater.prototype.act = function(context) {
   };
 };
 
-// var world = new World(plan, {
-//   "#": Wall,
-//   "o": BouncingCritter
-// });
-
-// for (var i = 0; i < 5; i += 1) {
-//   world.turn();
-//   console.log(world.toString());
-// };
+// Not My Solution, but I'll definitely be re-visiting after reading some YDKJS:
+function SmartPlantEater() {
+  this.energy = 30;
+  this.direction = "e";
+}
+SmartPlantEater.prototype.act = function(view) {
+  var space = view.find(" ");
+  if (this.energy > 90 && space) {
+    return {
+      type: "reproduce",
+      direction: space,
+    };
+  }
+  var plants = view.findAll("*");
+  if (plants.length > 1) {
+    return {
+      type: "eat",
+      direction: randomElement(plants),
+    };
+  }
+  if (view.look(this.direction) != " " && space) {
+    this.direction = space;
+  }
+  return {
+    type: "move", direction: this.direction
+  };
+};
 
 var valley = new LifelikeWorld(
   ["############################",
@@ -359,7 +381,7 @@ var valley = new LifelikeWorld(
    "##****     ###***       *###",
    "############################"],
   {"#": Wall,
-   "O": PlantEater,
+   "O": SmartPlantEater,
    "*": Plant}
 );
 

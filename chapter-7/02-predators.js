@@ -1,6 +1,8 @@
 /*
-  Project: Electronic Life
-  Our project in this chapter is to build a virtual ecosystem, a little world populated with critters that move around and struggle for survival.
+  Predators
+  Any serious ecosystem has a food chain longer than a single link. Write another critter that survives by eating the herbivore critter. You'll notice that stability is even harder to achieve now that there are cycles at multiple levels. Try to find a strategy to make the ecosystem run smoothly for at least a little while.
+
+  One thing that will help is to make the world bigger. This way, local population booms or busts are less likely to wipe out a species entirely, and there is space for the relatively large prey population needed to sustain a smaller predator population.
 */
 
 var plan = ["############################",
@@ -335,31 +337,74 @@ PlantEater.prototype.act = function(context) {
   };
 };
 
-// var world = new World(plan, {
-//   "#": Wall,
-//   "o": BouncingCritter
-// });
+// Okay I am officially lost with this exercise. Not my code or solution at all:
+function SmartPlantEater() {
+  this.energy = 30;
+  this.direction = "e";
+}
+SmartPlantEater.prototype.act = function(view) {
+  var space = view.find(" ");
+  if (this.energy > 90 && space)
+    return {type: "reproduce", direction: space};
+  var plants = view.findAll("*");
+  if (plants.length > 1)
+    return {type: "eat", direction: randomElement(plants)};
+  if (view.look(this.direction) != " " && space)
+    this.direction = space;
+  return {type: "move", direction: this.direction};
+};
 
-// for (var i = 0; i < 5; i += 1) {
-//   world.turn();
-//   console.log(world.toString());
-// };
+function Tiger() {
+  this.energy = 100;
+  this.direction = "w";
+  // Used to track the amount of prey seen per turn in the last six turns
+  this.preySeen = [];
+}
+Tiger.prototype.act = function(view) {
+  // Average number of prey seen per turn
+  var seenPerTurn = this.preySeen.reduce(function(a, b) {
+    return a + b;
+  }, 0) / this.preySeen.length;
+  var prey = view.findAll("O");
+  this.preySeen.push(prey.length);
+  // Drop the first element from the array when it is longer than 6
+  if (this.preySeen.length > 6)
+    this.preySeen.shift();
+
+  // Only eat if the predator saw more than ¼ prey animal per turn
+  if (prey.length && seenPerTurn > 0.25)
+    return {type: "eat", direction: randomElement(prey)};
+    
+  var space = view.find(" ");
+  if (this.energy > 400 && space)
+    return {type: "reproduce", direction: space};
+  if (view.look(this.direction) != " " && space)
+    this.direction = space;
+  return {type: "move", direction: this.direction};
+};
 
 var valley = new LifelikeWorld(
-  ["############################",
-   "#####                 ######",
-   "##   ***                **##",
-   "#   *##**         **  O  *##",
-   "#    ***     O    ##**    *#",
-   "#       O         ##***    #",
-   "#                 ##**     #",
-   "#   O       #*             #",
-   "#*          #**       O    #",
-   "#***        ##**    O    **#",
-   "##****     ###***       *###",
-   "############################"],
+  ["####################################################",
+   "#                 ####         ****              ###",
+   "#   *  @  ##                 ########       OO    ##",
+   "#   *    ##        O O                 ****       *#",
+   "#       ##*                        ##########     *#",
+   "#      ##***  *         ****                     **#",
+   "#* **  #  *  ***      #########                  **#",
+   "#* **  #      *               #   *              **#",
+   "#     ##              #   O   #  ***          ######",
+   "#*            @       #       #   *        O  #    #",
+   "#*                    #  ######                 ** #",
+   "###          ****          ***                  ** #",
+   "#       O                        @         O       #",
+   "#   *     ##  ##  ##  ##               ###      *  #",
+   "#   **         #              *       #####  O     #",
+   "##  **  O   O  #  #    ***  ***        ###      ** #",
+   "###               #   *****                    ****#",
+   "####################################################"],
   {"#": Wall,
-   "O": PlantEater,
+   "@": Tiger,
+   "O": SmartPlantEater, // from previous exercise
    "*": Plant}
 );
 
